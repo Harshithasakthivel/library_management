@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Students - Library Management System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        📚 Library Management System
+    </div>
+
+    <nav class="navigation">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Home
+        </a>
+
+        <a href="{{ url_for('books') }}">
+            📚 Books
+        </a>
+
+        <a href="{{ url_for('students') }}"
+           class="active">
+            👨‍🎓 Students
+        </a>
+
+        <a href="{{ url_for('issue_return') }}">
+            🔄 Issue / Return
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="main-container">
+
+
+    <div class="page-heading">
+
+        <h1>
+            👨‍🎓 Student Management
+        </h1>
+
+        <p>
+            Add and manage student information.
+        </p>
+
+    </div>
+
+
+    {% with messages =
+        get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <section class="section-card">
+
+        <div class="section-heading">
+
+            <h2>
+                ➕ Add Student
+            </h2>
+
+            <p>
+                Enter student details.
+            </p>
+
+        </div>
+
+
+        <form method="POST"
+              action="{{ url_for('students') }}"
+              class="book-form">
+
+
+            <div class="form-group">
+
+                <label>
+                    👤 Student Name
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter student name"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    🏫 Department
+                </label>
+
+                <input
+                    type="text"
+                    name="department"
+                    placeholder="Example: Computer Science"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📧 Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter email address"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <button
+                    type="submit"
+                    class="btn">
+
+                    ➕ Add Student
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <section class="section-card">
+
+        <div class="section-heading">
+
+            <h2>
+                👨‍🎓 Student Records
+            </h2>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for student in students %}
+
+                        <tr>
+
+                            <td>
+                                #{{ student.id }}
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    {{ student.name }}
+                                </strong>
+
+                            </td>
+
+                            <td>
+                                {{ student.department }}
+                            </td>
+
+                            <td>
+                                {{ student.email }}
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="empty">
+
+                                👨‍🎓 No students added yet.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <div class="bottom-home">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="btn">
+
+            🏠 Back to Dashboard
+
+        </a>
+
+    </div>
+
+
+</main>
+
+
+<script src="{{ url_for('static', filename='script.js') }}">
+</script>
+
+</body>
+
+</html>

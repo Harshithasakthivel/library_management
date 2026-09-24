@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Library Management System - Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="login-body">
+
+    <div class="login-background-shape shape-one"></div>
+    <div class="login-background-shape shape-two"></div>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="login-logo">
+                📚
+            </div>
+
+            <h1>
+                Library Management
+            </h1>
+
+            <p class="login-welcome">
+                Smart • Simple • Organized
+            </p>
+
+
+            {% with messages =
+                get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="alert {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <form method="POST"
+                  action="{{ url_for('login') }}">
+
+                <div class="form-group">
+
+                    <label>
+                        👤 Username
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Enter username"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        🔒 Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn login-btn">
+
+                    🔐 Login
+
+                </button>
+
+            </form>
+
+
+            <div class="demo-login">
+
+                <h3>
+                    🔑 Demo Login
+                </h3>
+
+                <p>
+                    Username:
+                    <strong>admin</strong>
+                </p>
+
+                <p>
+                    Password:
+                    <strong>admin123</strong>
+                </p>
+
+            </div>
+
+
+            <div class="login-footer">
+
+                📖 Library Management System
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

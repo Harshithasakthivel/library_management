@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Issue & Return - Library Management System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        📚 Library Management System
+    </div>
+
+    <nav class="navigation">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Home
+        </a>
+
+        <a href="{{ url_for('books') }}">
+            📚 Books
+        </a>
+
+        <a href="{{ url_for('students') }}">
+            👨‍🎓 Students
+        </a>
+
+        <a href="{{ url_for('issue_return') }}"
+           class="active">
+            🔄 Issue / Return
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="main-container">
+
+
+    <div class="page-heading">
+
+        <h1>
+            🔄 Issue & Return Books
+        </h1>
+
+        <p>
+            Manage book issue, return and fine details.
+        </p>
+
+    </div>
+
+
+    {% with messages =
+        get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="issue-return-grid">
+
+
+        <!-- =================================================
+             ISSUE BOOK
+        ================================================== -->
+
+        <section class="section-card issue-card">
+
+            <div class="section-heading">
+
+                <h2>
+                    📤 Issue Book
+                </h2>
+
+                <p>
+                    Issue an available book to a student.
+                </p>
+
+            </div>
+
+
+            {% if available_books and students %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('issue_book') }}">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            📚 Select Book
+                        </label>
+
+                        <select
+                            name="book_id"
+                            required>
+
+                            <option value="">
+                                -- Select Book --
+                            </option>
+
+                            {% for book in available_books %}
+
+                                <option
+                                    value="{{ book.id }}">
+
+                                    {{ book.title }}
+                                    -
+                                    {{ book.author }}
+                                    -
+                                    Available:
+                                    {{ book.available_quantity }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            👨‍🎓 Select Student
+                        </label>
+
+                        <select
+                            name="student_id"
+                            required>
+
+                            <option value="">
+                                -- Select Student --
+                            </option>
+
+                            {% for student in students %}
+
+                                <option
+                                    value="{{ student.id }}">
+
+                                    {{ student.name }}
+                                    -
+                                    {{ student.department }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            📅 Issue Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="issue_date"
+                            name="issue_date"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            📅 Due Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="due_date"
+                            name="due_date"
+                            required>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+
+                        📤 Issue Book
+
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <div class="empty-box">
+
+                    {% if not available_books %}
+
+                        📚 Please add an available book first.
+
+                    {% endif %}
+
+                    {% if not students %}
+
+                        👨‍🎓 Please add a student first.
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- =================================================
+             RETURN BOOK
+        ================================================== -->
+
+        <section class="section-card return-card">
+
+            <div class="section-heading">
+
+                <h2>
+                    📥 Return Book
+                </h2>
+
+                <p>
+                    Return an issued book and calculate fine.
+                </p>
+
+            </div>
+
+
+            {% if issued_transactions %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('return_book') }}"
+                    onsubmit="return confirmReturn();">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            🔄 Select Issued Book
+                        </label>
+
+                        <select
+                            name="transaction_id"
+                            required>
+
+                            <option value="">
+                                -- Select Transaction --
+                            </option>
+
+
+                            {% for transaction in issued_transactions %}
+
+                                <option
+                                    value="{{ transaction.id }}">
+
+                                    #{{ transaction.id }}
+                                    -
+                                    {{ transaction.title }}
+                                    -
+                                    {{ transaction.name }}
+                                    -
+                                    Due:
+                                    {{ transaction.due_date }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            📅 Return Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="return_date"
+                            name="return_date"
+                            required>
+
+                    </div>
+
+
+                    <div class="fine-info">
+
+                        <div class="fine-info-icon">
+                            💰
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Fine Information
+                            </strong>
+
+                            <p>
+                                ₹5 per day for late return.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+
+                        📥 Return Book
+
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <div class="empty-box">
+
+                    📚 No books are currently issued.
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         CURRENTLY ISSUED
+    ====================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading">
+
+            <h2>
+                📤 Currently Issued Books
+            </h2>
+
+            <p>
+                Books that are currently with students.
+            </p>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Book
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Issue Date
+                        </th>
+
+                        <th>
+                            Due Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for transaction in issued_transactions %}
+
+                        <tr>
+
+                            <td>
+                                #{{ transaction.id }}
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    {{ transaction.title }}
+                                </strong>
+
+                                <br>
+
+                                <small>
+                                    {{ transaction.author }}
+                                </small>
+
+                            </td>
+
+                            <td>
+                                {{ transaction.name }}
+                            </td>
+
+                            <td>
+                                {{ transaction.department }}
+                            </td>
+
+                            <td>
+                                {{ transaction.issue_date }}
+                            </td>
+
+                            <td>
+                                {{ transaction.due_date }}
+                            </td>
+
+                            <td>
+
+                                <span class="status status-issued">
+                                    Issued
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty">
+
+                                📚 No currently issued books.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TRANSACTION HISTORY
+    ====================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading">
+
+            <h2>
+                📜 Transaction History
+            </h2>
+
+            <p>
+                Complete issue and return history.
+            </p>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Book
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Issue Date
+                        </th>
+
+                        <th>
+                            Due Date
+                        </th>
+
+                        <th>
+                            Return Date
+                        </th>
+
+                        <th>
+                            Fine
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for transaction in history %}
+
+                        <tr>
+
+                            <td>
+                                #{{ transaction.id }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ transaction.title }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ transaction.name }}
+                            </td>
+
+                            <td>
+                                {{ transaction.issue_date }}
+                            </td>
+
+                            <td>
+                                {{ transaction.due_date }}
+                            </td>
+
+                            <td>
+
+                                {% if transaction.return_date %}
+
+                                    {{ transaction.return_date }}
+
+                                {% else %}
+
+                                    <span class="not-returned">
+                                        Not Returned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <strong class="fine-text">
+
+                                    ₹{{ transaction.fine or 0 }}
+
+                                </strong>
+
+                            </td>
+
+                            <td>
+
+                                {% if transaction.status == "Returned" %}
+
+                                    <span class="status status-returned">
+                                        Returned
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-issued">
+                                        Issued
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="empty">
+
+                                📜 No transaction history.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <div class="bottom-home">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="btn">
+
+            🏠 Back to Dashboard
+
+        </a>
+
+    </div>
+
+
+</main>
+
+
+<script src="{{ url_for('static', filename='script.js') }}">
+</script>
+
+
+<script>
+
+    /* Set today's date */
+
+    const today =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
+
+    /* Issue date */
+
+    const issueDate =
+        document.getElementById(
+            "issue_date"
+        );
+
+
+    if (issueDate) {
+
+        issueDate.value = today;
+
+        issueDate.min = today;
+
+    }
+
+
+    /* Due date */
+
+    const dueDate =
+        document.getElementById(
+            "due_date"
+        );
+
+
+    if (dueDate) {
+
+        dueDate.min = today;
+
+
+        const defaultDueDate =
+            new Date();
+
+        defaultDueDate.setDate(
+            defaultDueDate.getDate() + 7
+        );
+
+
+        dueDate.value =
+            defaultDueDate
+            .toISOString()
+            .split("T")[0];
+
+    }
+
+
+    /* Return date */
+
+    const returnDate =
+        document.getElementById(
+            "return_date"
+        );
+
+
+    if (returnDate) {
+
+        returnDate.value = today;
+
+    }
+
+</script>
+
+</body>
+
+</html>
